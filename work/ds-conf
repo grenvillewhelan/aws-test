@@ -1,0 +1,48 @@
+pass 0fucuky@Fr1ed
+
+/data/opendj/setup \
+          --instancePath /data/opendj \
+          --serverId Nicola_Ploeg \
+          --deploymentId AXGnHauEdWirlVezja4Xa35pDOI0Lg5CBVN1bkVDNrdY8GgkatPj \
+          --deploymentIdPassword ****** \
+          --rootUserDn uid=admin \
+          --rootUserPassword ****** \
+          --hostname eastus2-pingds1 \
+          --adminConnectorPort 4444 \
+          --start \
+          --ldapPort 389 \
+          --ldapsPort 636 \
+          --httpsPort 8443 \
+          --replicationPort 8989 \
+          --profile ds-evaluation \
+          --set ds-evaluation/generatedUsers:100000 \
+          --set ds-evaluation/useOutdatedPasswordStorage:true
+
+Available profiles:
+
+    1)  AM configuration data store
+    2)  AM CTS data store
+    3)  AM identity data store
+    4)  DS evaluation
+    5)  DS proxied server
+    6)  DS proxy server
+    7)  DS user data store
+    8)  IDM external repository
+
+Network Parameters
+--------------------------------------------
+LDAP (cleartext)      Listening on port 389
+LDAPS (secure)        Listening on port 636
+HTTP (cleartext)      Disabled
+HTTPS (secure)        Listening on port 8443
+Replication (secure)  8989
+
+
+dsconfig list-backends \
+          --hostname eastus2-pingds1 \
+          --port 4444 \
+          --bindDn uid=admin \
+          --bindPassword ****** \
+          --trustAll \
+          --no-prompt
+

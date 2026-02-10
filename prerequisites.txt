@@ -1,0 +1,6 @@
+1. Install aws cli
+2. Install terraform and packer
+3. Install hcl2json and jq
+4. Install git
+5. Set ~/.aws/credentials for AWS Account
+6. Update tfvars file with customer details

@@ -1,0 +1,53 @@
+#!/bin/bash
+
+first_run=1
+wait_file="/tmp/.deplog$$"
+
+if [ "$1" == "-m" ]; then
+   touch ${wait_file}
+   arg=$2
+else
+   arg=$1
+fi
+
+if [ -n "${arg}" ]; then
+   f=${arg}
+else
+   f="/Users/grenvillewhelan/AccessIdentified/BT/*-deployment/deployment.log"
+fi
+
+if [ ! -f ${f} ]; then
+   echo "$0: cannot open ${f}, exiting"
+   exit 1
+fi
+
+while [ -f ${wait_file} -o ${first_run} -eq 1 ]; do
+
+   if [ -f ${wait_file} ]; then
+      clear
+      echo "Deployment log monitoring - delete ${wait_file} to stop"
+      echo
+   else
+      first_run=0
+   fi
+
+   to_create=$(grep Plan $f | head -1  | awk '{print $2}')
+   to_destroy=$(grep Plan $f | tail -1 |awk '{print $8}')
+
+   echo "Created:   "$(grep -i 'creation complete' $f | wc -l)" of ${to_create}"
+   echo "Destroyed: "$(grep -i 'destruction complete' $f | wc -l)" of ${to_destroy}"
+
+   if [ -f ${wait_file} ]; then
+      sleep 2
+   fi
+
+   if [ ! -f ${f} -o ! -f ${wait_file} ]; then
+      if [ -f ${wait_file} ]; then
+         rm -f ${wait_file}
+         echo
+         echo Finished.
+      fi
+      exit 0
+   fi
+done
+

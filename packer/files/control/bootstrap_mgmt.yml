@@ -1,0 +1,64 @@
+---
+- name: Setup Internal Git and Binary Repos
+  hosts: mgmt_server
+  become: yes
+  vars:
+    gitea_bin: "gitea-1.21-linux-amd64"
+    nexus_archive: "nexus-3.62.0-01-unix.tar.gz"
+
+  tasks:
+    # --- GITEA SETUP ---
+    - name: Create Git User
+      ansible.builtin.user:
+        name: git
+        system: yes
+        shell: /bin/bash
+
+    - name: Copy Gitea Binary
+      ansible.builtin.copy:
+        src: "files/{{ gitea_bin }}"
+        dest: /usr/local/bin/gitea
+        mode: '0755'
+        owner: git
+
+    - name: Create Gitea Directories
+      ansible.builtin.file:
+        path: "{{ item }}"
+        state: directory
+        owner: git
+        mode: '0750'
+      loop:
+        - /var/lib/gitea
+        - /etc/gitea
+
+    # --- NEXUS SETUP ---
+    - name: Create Nexus User
+      ansible.builtin.user:
+        name: nexus
+        system: yes
+
+    - name: Extract Nexus Archive
+      ansible.builtin.unarchive:
+        src: "files/{{ nexus_archive }}"
+        dest: /opt/
+        owner: nexus
+
+    - name: Find Nexus Directory Name
+      ansible.builtin.find:
+        paths: /opt/
+        patterns: "nexus-*"
+        file_type: directory
+      register: nexus_dir
+
+    - name: Set Nexus as Service
+      ansible.builtin.lineinfile:
+        path: "{{ nexus_dir.files[0].path }}/bin/nexus.rc"
+        regexp: '^#run_as_user=""'
+        line: 'run_as_user="nexus"'
+
+    # --- START SERVICES ---
+    - name: Start Nexus via Command
+      ansible.builtin.command:
+        cmd: "{{ nexus_dir.files[0].path }}/bin/nexus start"
+      become_user: nexus
+

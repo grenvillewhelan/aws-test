@@ -1,0 +1,7 @@
+os_base               = "ubuntu-jammy-22.04"
+harbian_version       = "0.7.0"
+pingfed_version       = "12.1.1"
+pingdir_version       = "10.1.0.2"
+pingds_version        = "8.0.2"
+pingam_version        = "8.0.2"
+pingidm_version       = "8.0.1"

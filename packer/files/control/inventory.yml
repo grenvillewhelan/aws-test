@@ -1,0 +1,45 @@
+---
+all:
+  vars:
+    # Global variables for your 50k user environment
+    ansible_user: ansible
+    ansible_ssh_private_key_file: /home/ansible/.ssh/id_ed25519
+    ansible_python_interpreter: /usr/bin/python3
+
+  children:
+    # --- Management Layer ---
+    management:
+      hosts:
+        mgmt-server-01:
+          ansible_host: 10.0.1.10  # Replace with your Azure/vSphere IP
+
+    # --- Identity Stack (The Ping Cluster) ---
+    ping_stack:
+      children:
+        directory_nodes: # PingDS (2 nodes for HA)
+          hosts:
+            ds-01:
+              ansible_host: 10.0.2.11
+            ds-02:
+              ansible_host: 10.0.2.12
+        
+        access_nodes: # PingAM (2 nodes for HA)
+          hosts:
+            am-01:
+              ansible_host: 10.0.2.21
+            am-02:
+              ansible_host: 10.0.2.22
+
+        idm_nodes: # PingIDM (2 nodes for HA)
+          hosts:
+            idm-01:
+              ansible_host: 10.0.2.31
+            idm-02:
+              ansible_host: 10.0.2.32
+
+    # --- Entry Point ---
+    load_balancers:
+      hosts:
+        lb-01:
+          ansible_host: 10.0.1.5
+
