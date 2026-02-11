@@ -4,4 +4,4 @@
 **/.terraform/
 
 .secrets
-dotnext-dev
+dotnext-dev-deployment
