@@ -1,5 +1,9 @@
 dns_suffix  = {
-   "aws"   = "accessidentifiedcloud.com"
+   "aws"   = "dotnext.accessidentifiedcloud.com"
+}
+
+dns_delegation = {
+  "aws"    = "N0633201T77TLFPVW9M0"
 }
 
 account_owner = {
@@ -36,7 +40,12 @@ manifest = {
                         "network"           = { dev = 1, prod = 1}
                         "web_ingress"       = { dev = 0, prod = 0}
                         "control"           = { dev = 1, prod = 1}
-                        "cyberark"          = { dev = 1, prod = 1}
+                        "cavault"           = { dev = 1, prod = 1}
+                        "capvwa"            = { dev = 1, prod = 1}
+                        "cacpm"             = { dev = 1, prod = 1}
+                        "capsm"             = { dev = 1, prod = 1}
+                        "capsml"            = { dev = 1, prod = 1}
+                        "capsmp"            = { dev = 1, prod = 1}
                         "pingds"            = { dev = 1, prod = 1}
                         "pingam"            = { dev = 1, prod = 1}
                         "pingidm"           = { dev = 1, prod = 1}
@@ -59,7 +68,11 @@ subnets = [
           ]
 
 internet_control_access = {
-   "dev"  = ["82.9.79.207/32"] 
+   "dev"  = [
+             "82.9.79.207/32",           // Gren home
+             "197.87.7.107/32",          // Andre home
+             "102.66.192.81/32"          // KG home
+            ] 
    "prod" = ["82.9.79.207/32"]
 }
 
@@ -107,10 +120,110 @@ products = {
         parameters      = {}
      }
 
-     "cyberark" = {
-        module          = "cyberark"
+     "cavault" = {
+        module          = "cavault"
         cluster         = ""
-        subnet          = "data"
+        subnet          = "internet"
+        ami             = {
+                             "aws" = { 
+                                "dev"  = "AIL-Windows_Server-2022-English-Core-Base-cyberark"
+                                "prod" = "AIL-Windows_Server-2022-English-Core-Base-cyberark"
+                             }
+                          }
+        instance        = {
+                             "aws" = {
+                                "dev"  = "t3.medium"
+                                "prod" = "t3.medium"
+                             }
+                          }
+        requires        = "network"
+        parameters      = {}
+     }
+
+     "capvwa" = {
+        module          = "capvwa"
+        cluster         = ""
+        subnet          = "internet"
+        ami             = {
+                             "aws" = { 
+                                "dev"  = "AIL-Windows_Server-2022-English-Core-Base-cyberark"
+                                "prod" = "AIL-Windows_Server-2022-English-Core-Base-cyberark"
+                             }
+                          }
+        instance        = {
+                             "aws" = {
+                                "dev"  = "t3.medium"
+                                "prod" = "t3.medium"
+                             }
+                          }
+        requires        = "network"
+        parameters      = {}
+     }
+
+     "cacpm" = {
+        module          = "cacpm"
+        cluster         = ""
+        subnet          = "internet"
+        ami             = {
+                             "aws" = { 
+                                "dev"  = "AIL-Windows_Server-2022-English-Core-Base-cyberark"
+                                "prod" = "AIL-Windows_Server-2022-English-Core-Base-cyberark"
+                             }
+                          }
+        instance        = {
+                             "aws" = {
+                                "dev"  = "t3.medium"
+                                "prod" = "t3.medium"
+                             }
+                          }
+        requires        = "network"
+        parameters      = {}
+     }
+
+     "capsm" = {
+        module          = "capsm"
+        cluster         = ""
+        subnet          = "internet"
+        ami             = {
+                             "aws" = { 
+                                "dev"  = "AIL-Windows_Server-2022-English-Core-Base-cyberark"
+                                "prod" = "AIL-Windows_Server-2022-English-Core-Base-cyberark"
+                             }
+                          }
+        instance        = {
+                             "aws" = {
+                                "dev"  = "t3.medium"
+                                "prod" = "t3.medium"
+                             }
+                          }
+        requires        = "network"
+        parameters      = {}
+     }
+
+     "capsml" = {
+        module          = "capsml"
+        cluster         = ""
+        subnet          = "internet"
+        ami             = {
+                             "aws" = { 
+                                "dev"  = "AIL-RHEL-9.3.0_HVM-20240229-arm64-arm-capsm"
+                                "prod" = "AIL-RHEL-9.3.0_HVM-20240229-arm64-arm-capsm"
+                             }
+                          }
+        instance        = {
+                             "aws" = {
+                                "dev"  = "t4g.micro"
+                                "prod" = "t4g.micro"
+                             }
+                          }
+        requires        = "network"
+        parameters      = {}
+     }
+
+     "capsmp" = {
+        module          = "capsmp"
+        cluster         = ""
+        subnet          = "internet"
         ami             = {
                              "aws" = { 
                                 "dev"  = "AIL-Windows_Server-2022-English-Core-Base-cyberark"

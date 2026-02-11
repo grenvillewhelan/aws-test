@@ -25,6 +25,33 @@ source "amazon-ebs" "AIL-base" {
   }
 }
 
+source "amazon-ebs" "AIL-capsm" {
+  ami_name      = "${var.ami_prefix}-${var.os_redhat_base}-arm-capsm-${var.tag_version}"
+  instance_type = "t4g.small"
+  region        = var.region
+  ami_regions   = var.ami_regions
+  profile       = var.profile
+
+  source_ami_filter {
+    filters = {
+      name                = "${var.os_redhat_base}-*"
+      root-device-type    = "ebs"
+      virtualization-type = "hvm"
+    }
+    most_recent = true
+    owners = [ "309956199498" ]
+  }
+
+  ssh_username = "ec2-user"
+  encrypt_boot = true
+  iam_instance_profile = "packer"
+  tags = {
+    "Name" = "${var.ami_prefix}-${var.os_redhat_base}-arm-capsm-${var.tag_version}"
+    "ServerType": "capsm"
+    "ImageVersion": "${var.tag_version}"
+  }
+}
+
 source "amazon-ebs" "AIL-control" {
   ami_name      = "${var.ami_prefix}-${var.os_base}-arm-control-${var.tag_version}"
   instance_type = "t4g.small"

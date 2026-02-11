@@ -32,6 +32,7 @@ OS_BASE_AZURE="Ubuntu-22_04-lts"
 OS_BASE_AZURE_WINDOWS="Windows_Server-2022-English-Core-Base"
 OS_BASE_AWS="ubuntu-jammy-22.04-arm64-server"
 OS_BASE_AWS_WINDOWS="Windows_Server-2022-English-Core-Base"
+OS_BASE_AWS_REDHAT="RHEL-9.*-arm64"
 
 ARM_ACCOUNT_KEY="no-azure-not-applicable"
 ARM_CLIENT_ID="no-azure-not-applicable"
@@ -1897,8 +1898,8 @@ function create_locals() {
       echo "         }"
 
       echo "         \"external\" = {"
-      printf '//            dns_zone_id   = module.network_%s.external_dns_zone_id\n' ${primary_alias}
-      printf '//            dns_zone_name = module.network_%s.external_dns_zone_name\n' ${primary_alias}
+      printf '            dns_zone_id   = module.network_%s.external_dns_zone_id\n' ${primary_alias}
+      printf '            dns_zone_name = module.network_%s.external_dns_zone_name\n' ${primary_alias}
       echo "         }"
       printf "      }\n"
    done
@@ -2122,6 +2123,7 @@ function build_amis() {
       echo "  client_id:       ${ARM_CLIENT_ID}"
       echo "  client_secret:   ${ARM_CLIENT_SECRET}"
       echo "  os_base:         ${OS_BASE_AWS}"
+      echo "  os_redhat_base:  ${OS_BASE_AWS_REDHAT}"
       echo "  primary region:  ${PRIMARY_REGION}"
       echo "  other regions:   ${OTHER_REGIONS}"
       echo "  AMI prefix:      \"${AMI_PREFIX}\""
@@ -2143,6 +2145,7 @@ function build_amis() {
              -var "aws_secret_access_key=${aws_secret_access_key}" \
              -var "aws_access_key_id=${aws_access_key_id}" \
              -var "os_base=${OS_BASE_AWS}" \
+             -var "os_redhat_base=${OS_BASE_AWS_REDHAT}" \
              -var "os_base_win=${OS_BASE_AWS_WINDOWS}" \
              -var "subscription_id=${ARM_SUBSCRIPTION_ID}" \
              -var "tenant_id=${ARM_TENANT_ID}" \
@@ -2173,6 +2176,7 @@ function build_amis() {
              -var "aws_access_key_id=${aws_access_key_id}" \
              -var "os_base=${OS_BASE_AWS}" \
              -var "os_base_win=${OS_BASE_AWS_WINDOWS}" \
+             -var "os_redhat_base=${OS_BASE_AWS_REDHAT}" \
              -var "subscription_id=${ARM_SUBSCRIPTION_ID}" \
              -var "tenant_id=${ARM_TENANT_ID}" \
              -var "client_id=${ARM_CLIENT_ID}" \
@@ -2243,6 +2247,7 @@ function build_amis() {
                  -var "aws_secret_access_key=${aws_secret_access_key}" \
                  -var "aws_access_key_id=${aws_access_key_id}" \
                  -var "os_base=${OS_BASE_AZURE}" \
+                 -var "os_redhat_base=${OS_BASE_AWS_REDHAT}" \
                  -var "os_base_win=${OS_BASE_AZURE_WINDOWS}" \
                  -var "subscription_id=${ARM_SUBSCRIPTION_ID}" \
                  -var "tenant_id=${ARM_TENANT_ID}" \

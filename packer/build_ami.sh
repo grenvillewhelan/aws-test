@@ -8,6 +8,7 @@
   OTHER_REGIONS='["eu-west-1"]'
   OS_BASE_AWS=ubuntu-jammy-22.04-arm64-server
   OS_BASE_AWS_WINDOWS="Windows_Server-2022-English-Core-Base"
+  OS_BASE_AWS_REDHAT="RHEL-9.3.0_HVM-20240229-arm64"
 
   ARM_ACCOUNT_KEY="no-azure-not-applicable"
   ARM_CLIENT_ID="no-azure-not-applicable"
@@ -17,7 +18,7 @@
   TAG_VERSION="v1.0.0e"
 
 packer build \
-   -only "*.amazon-ebs.${AMI_PREFIX}-cyberark" \
+   -only "*.amazon-ebs.${AMI_PREFIX}-capsm" \
    -var "profile=${AWS_PROFILE}" \
    -var "aws_account=${AMI_ACCOUNT_OWNER}" \
    -var "region=${PRIMARY_REGION}" \
@@ -30,6 +31,7 @@ packer build \
    -var "aws_secret_access_key=${aws_secret_access_key}" \
    -var "aws_access_key_id=${aws_access_key_id}" \
    -var "os_base=${OS_BASE_AWS}" \
+   -var "os_redhat_base=${OS_BASE_AWS_REDHAT}" \
    -var "os_base_win=${OS_BASE_AWS_WINDOWS}" \
    -var "subscription_id=${ARM_SUBSCRIPTION_ID}" \
    -var "tenant_id=${ARM_TENANT_ID}" \

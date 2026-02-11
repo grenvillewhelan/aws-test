@@ -4,7 +4,7 @@
 
 export cloud_providers=$(jq -n ${CLOUD_PROVIDERS} | jq -r '. | join(" ")')
 
-update_name_tag "${PRODUCT_NAME}-${REGION}"
+update_name_tag "${PRODUCT_NAME}-deploying"
 
 echo "$0: Starting at $(date)"
          
@@ -36,3 +36,4 @@ do
    fi
 done
 
+update_name_tag "${PRODUCT_NAME}-running"

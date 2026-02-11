@@ -73,6 +73,26 @@ build {
 }
 
 build {
+  name = "AIL-${var.os_redhat_base}-capsm"
+  sources = [ "source.amazon-ebs.AIL-capsm" ]
+
+//  provisioner "file" {
+//    sources = [
+//      "scripts/install-control.sh",
+//      "files/control/scripts/control.sh"
+//    ]
+//    destination = "/opt/AIL/install/"
+//  }
+
+//  provisioner "shell" {
+//    inline = [
+//      "sudo bash /opt/AIL/install/install-control.sh ${var.region}",
+//      "sudo chmod a+x /opt/AIL/tools/*.sh"
+//    ]
+//  }
+}
+
+build {
   name = "AIL-${var.os_base}-pingds"
   sources = [ "source.amazon-ebs.AIL-pingds" ]
 

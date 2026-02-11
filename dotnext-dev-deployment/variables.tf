@@ -1,0 +1,169 @@
+variable "build_version" {
+   type = string
+}
+
+variable "cloud_region" {
+   type = string
+   default = "none"
+}
+
+variable "cloud_provider" {
+   type = string
+   default = "none"
+}
+
+variable "aws_storage_account" {
+   type = string
+   default = "none"
+}
+
+variable "tf_state_cloud_provider" {
+   type = string
+}
+
+variable "cloud_providers" {
+   type = string
+}
+
+variable "deployment_status" {
+   type = string
+   default = "go"
+}
+
+variable "terraform_backend_storage" {
+   type = string
+}
+
+variable "account_owner" {
+   type = map(map(string))
+}
+
+variable "ami_account_owner" {
+   type = map(map(string))
+}
+
+variable "https_customer_certificate" {
+   type    = bool
+   default = false
+}
+
+variable "control-access" {
+   default = [
+    "10.153.36.0/24"
+  ]
+}
+
+variable "internet_control_access" {
+  type = map(list(string))
+}
+
+variable "dns_suffix" {
+  type = map(string)
+}
+
+variable "dns_delegation" {
+  type = map(string)
+}
+
+variable "termination_protection" {
+  type = bool
+}
+
+variable "test_mode" {
+   type = bool
+   default = false
+}
+
+variable "customer_name" {
+   type = string
+}
+
+variable "terraform_state_locking" {
+   default = "dotnext-dev-lockfile"
+   type = string
+}
+
+variable "remote_state" {
+   type = string
+}
+
+variable "route53_provider" {
+   type = string
+   default = "route53"
+}
+
+variable "manifest" {
+  type = map(list(object({
+    region_alias = string
+    region_name = string
+    enable_vpn = bool
+    azs = list (string)
+    products = map(map(number))
+    network_range = map (string)
+  })))
+}
+
+variable "products" {
+   type = map(object({
+      module   = string
+      cluster  = string
+      subnet   = string
+      ami      = map(map(string))
+      instance = map(map(string))
+      requires = string
+      parameters = map(string)
+   }))
+}
+
+variable "subnets" {
+   type = list(object({
+      subnet_name = string
+      newbits     = number
+      netnum      = number
+      nat_gw      = bool
+   }))
+}
+
+variable "web_ingress_logs_enabled" {
+   type = bool
+   default = false
+}
+
+variable "resource_group" {
+   type = string
+   default = "dev"
+}
+
+variable "elb_account_id" {
+   type = map(string)
+
+   default = {
+
+      af-south-1        = "098369216593"
+      ap-east-1         = "754344448648"
+      ap-southeast-1    = "114774131450"
+      ap-southeast-2    = "783225319266"
+      ap-southeast-3    = "589379963580"
+      eu-central-1      = "054676820928"
+      eu-north-1        = "897822967062"
+      eu-south-1        = "635631232127"
+      eu-west-1         = "156460612806"
+      eu-west-2         = "652711504416"
+      eu-west-3         = "009996457667"
+      me-south-1        = "076674570225"
+      sa-east-1         = "507241528517"
+      us-east-1         = "127311923021"
+      us-east-2         = "033677994240"
+      us-west-1         = "027434742980"
+      us-west-2         = "797873946194"
+   }
+}
+
+locals {
+
+  route53_suffix = length(join( ".", compact([for num,entry in split(".", var.customer_name) : num > 0 ? entry : ""]))) > 0 ? join(".", [terraform.workspace, join( ".", compact([for num,entry in split(".", var.customer_name) : num > 0 ? entry : ""])), var.dns_suffix]) : var.dns_suffix
+
+  regional_vpcs = [
+    "a", "b", "c", "d"
+  ]
+}

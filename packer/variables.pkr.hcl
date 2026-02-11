@@ -83,6 +83,11 @@ variable "os_base" {
    default = "none"
 }
 
+variable "os_redhat_base" {
+   type = string
+   default = "none"
+}
+
 variable "os_base_win" {
    type = string
    default = "none"

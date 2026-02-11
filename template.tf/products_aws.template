@@ -13,6 +13,7 @@ module "network_!!REGION_ALIAS!!" {
    regions                              = [for region, entry in var.manifest["!!CLOUD!!"] : region]
    other_cloud_regions                  = compact([for name, entry in var.manifest : name != "!!CLOUD!!" ? name : ""])
    dns_suffix                           = var.dns_suffix
+   dns_delegation                       = var.dns_delegation
    cloud_providers                      = local.cloud_providers
    subnets                              = var.subnets
    vpcs                                 = local.vpcs
@@ -233,9 +234,9 @@ module "pingidm_!!REGION_ALIAS!!" {
    }
 }
 
-module "cyberark_!!REGION_ALIAS!!" {
-   source                               = "./modules_aws/cyberark"
-   module                               = "cyberark"
+module "capvwa_!!REGION_ALIAS!!" {
+   source                               = "./modules_aws/capvwa"
+   module                               = "capvwa"
    products                             = var.products
    product_name                         = "!!PRODUCT!!"
    instance_type                        = var.products["!!PRODUCT!!"].instance["!!CLOUD!!"][terraform.workspace]
@@ -279,3 +280,231 @@ module "cyberark_!!REGION_ALIAS!!" {
    }
 }
 
+module "cacpm_!!REGION_ALIAS!!" {
+   source                               = "./modules_aws/cacpm"
+   module                               = "cacpm"
+   products                             = var.products
+   product_name                         = "!!PRODUCT!!"
+   instance_type                        = var.products["!!PRODUCT!!"].instance["!!CLOUD!!"][terraform.workspace]
+   account_owner                        = var.account_owner["!!CLOUD!!"][terraform.workspace]
+   ami_account_owner                    = var.ami_account_owner["!!CLOUD!!"][terraform.workspace]
+   ami_version                          = "${var.products["!!PRODUCT!!"].ami["!!CLOUD!!"][terraform.workspace]}-!!TAG_VERSION!!"
+   aws_key_pair_id                      = aws_key_pair.!!REGION_ALIAS!!_admin_access.id
+   module_version                       = "TBA"
+   products_installed                   = local.products_installed["!!CLOUD!!"]
+   vpc_id                               = local.vpcs["!!REGION_ALIAS!!"]
+   customer_name                        = var.customer_name
+   dns_suffix                           = var.dns_suffix
+   termination_protection               = var.termination_protection
+   cidr_blocks                          = local.subnet_cidr_blocks
+   security_group_ids                   = local.security_group_ids["!!REGION_ALIAS!!"]
+   first_region_running                 = compact([for index, entry in var.manifest["!!CLOUD!!"] : entry.products["!!PRODUCT!!"][terraform.workspace] > 0 ? index : ""] )[0]
+   number_of_regions                    = length(var.manifest["!!CLOUD!!"])
+   region_number                        = !!REGION_NUMBER!!
+   my_manifest                          = var.manifest["!!CLOUD!!"][!!REGION_NUMBER!!]
+   number_servers                       = var.manifest["!!CLOUD!!"][!!REGION_NUMBER!!].products["!!PRODUCT!!"][terraform.workspace]
+   subnet_ids                           = local.subnet_ids["!!REGION_ALIAS!!"][var.products["!!PRODUCT!!"].subnet]
+   health_check_grace_period = 300
+   primary_parameter_stores             = {for a,b in var.manifest : a => try(flatten(compact([for index, entry in b : entry.products["!!PRODUCT!!"][terraform.workspace] > 0 ? entry.region_name : "" ]))[0], "")}
+   san_list                             = local.san_list
+   dns_prefix                           = lookup(var.products["!!PRODUCT!!"].parameters, "dns_prefix", "ldap")
+   region_list                          = {for x,y in var.manifest : x => compact([for a,b in y : b.products["!!PRODUCT!!"][terraform.workspace] > 0 ? b.region_name : ""])}
+   cloud_dns                            = local.cloud_dns
+   cloud_provider                       = "!!CLOUD!!"
+   cloud_providers                      = local.cloud_providers
+   subscription_id                      = var.account_owner["aws"][terraform.workspace]
+   az                                   = var.manifest["!!CLOUD!!"][!!REGION_NUMBER!!].azs
+   tenant_id                            = local.tenant_id
+   client_id                            = local.client_id
+   client_secret                        = local.client_secret
+   aws_storage_account                  = var.aws_storage_account
+   internet_control_access              = var.internet_control_access[terraform.workspace]
+
+   providers = {
+      aws.route53 = aws.route53
+      aws = aws.!!REGION_ALIAS!!
+   }
+}
+
+module "capsm_!!REGION_ALIAS!!" {
+   source                               = "./modules_aws/capsm"
+   module                               = "capsm"
+   products                             = var.products
+   product_name                         = "!!PRODUCT!!"
+   instance_type                        = var.products["!!PRODUCT!!"].instance["!!CLOUD!!"][terraform.workspace]
+   account_owner                        = var.account_owner["!!CLOUD!!"][terraform.workspace]
+   ami_account_owner                    = var.ami_account_owner["!!CLOUD!!"][terraform.workspace]
+   ami_version                          = "${var.products["!!PRODUCT!!"].ami["!!CLOUD!!"][terraform.workspace]}-!!TAG_VERSION!!"
+   aws_key_pair_id                      = aws_key_pair.!!REGION_ALIAS!!_admin_access.id
+   module_version                       = "TBA"
+   products_installed                   = local.products_installed["!!CLOUD!!"]
+   vpc_id                               = local.vpcs["!!REGION_ALIAS!!"]
+   customer_name                        = var.customer_name
+   dns_suffix                           = var.dns_suffix
+   termination_protection               = var.termination_protection
+   cidr_blocks                          = local.subnet_cidr_blocks
+   security_group_ids                   = local.security_group_ids["!!REGION_ALIAS!!"]
+   first_region_running                 = compact([for index, entry in var.manifest["!!CLOUD!!"] : entry.products["!!PRODUCT!!"][terraform.workspace] > 0 ? index : ""] )[0]
+   number_of_regions                    = length(var.manifest["!!CLOUD!!"])
+   region_number                        = !!REGION_NUMBER!!
+   my_manifest                          = var.manifest["!!CLOUD!!"][!!REGION_NUMBER!!]
+   number_servers                       = var.manifest["!!CLOUD!!"][!!REGION_NUMBER!!].products["!!PRODUCT!!"][terraform.workspace]
+   subnet_ids                           = local.subnet_ids["!!REGION_ALIAS!!"][var.products["!!PRODUCT!!"].subnet]
+   health_check_grace_period = 300
+   primary_parameter_stores             = {for a,b in var.manifest : a => try(flatten(compact([for index, entry in b : entry.products["!!PRODUCT!!"][terraform.workspace] > 0 ? entry.region_name : "" ]))[0], "")}
+   san_list                             = local.san_list
+   dns_prefix                           = lookup(var.products["!!PRODUCT!!"].parameters, "dns_prefix", "ldap")
+   region_list                          = {for x,y in var.manifest : x => compact([for a,b in y : b.products["!!PRODUCT!!"][terraform.workspace] > 0 ? b.region_name : ""])}
+   cloud_dns                            = local.cloud_dns
+   cloud_provider                       = "!!CLOUD!!"
+   cloud_providers                      = local.cloud_providers
+   subscription_id                      = var.account_owner["aws"][terraform.workspace]
+   az                                   = var.manifest["!!CLOUD!!"][!!REGION_NUMBER!!].azs
+   tenant_id                            = local.tenant_id
+   client_id                            = local.client_id
+   client_secret                        = local.client_secret
+   aws_storage_account                  = var.aws_storage_account
+   internet_control_access              = var.internet_control_access[terraform.workspace]
+
+   providers = {
+      aws.route53 = aws.route53
+      aws = aws.!!REGION_ALIAS!!
+   }
+}
+
+module "capsml_!!REGION_ALIAS!!" {
+   source                               = "./modules_aws/capsml"
+   module                               = "capsml"
+   products                             = var.products
+   product_name                         = "!!PRODUCT!!"
+   instance_type                        = var.products["!!PRODUCT!!"].instance["!!CLOUD!!"][terraform.workspace]
+   account_owner                        = var.account_owner["!!CLOUD!!"][terraform.workspace]
+   ami_account_owner                    = var.ami_account_owner["!!CLOUD!!"][terraform.workspace]
+   ami_version                          = "${var.products["!!PRODUCT!!"].ami["!!CLOUD!!"][terraform.workspace]}-!!TAG_VERSION!!"
+   aws_key_pair_id                      = aws_key_pair.!!REGION_ALIAS!!_admin_access.id
+   module_version                       = "TBA"
+   products_installed                   = local.products_installed["!!CLOUD!!"]
+   vpc_id                               = local.vpcs["!!REGION_ALIAS!!"]
+   customer_name                        = var.customer_name
+   dns_suffix                           = var.dns_suffix
+   termination_protection               = var.termination_protection
+   cidr_blocks                          = local.subnet_cidr_blocks
+   security_group_ids                   = local.security_group_ids["!!REGION_ALIAS!!"]
+   first_region_running                 = compact([for index, entry in var.manifest["!!CLOUD!!"] : entry.products["!!PRODUCT!!"][terraform.workspace] > 0 ? index : ""] )[0]
+   number_of_regions                    = length(var.manifest["!!CLOUD!!"])
+   region_number                        = !!REGION_NUMBER!!
+   my_manifest                          = var.manifest["!!CLOUD!!"][!!REGION_NUMBER!!]
+   number_servers                       = var.manifest["!!CLOUD!!"][!!REGION_NUMBER!!].products["!!PRODUCT!!"][terraform.workspace]
+   subnet_ids                           = local.subnet_ids["!!REGION_ALIAS!!"][var.products["!!PRODUCT!!"].subnet]
+   health_check_grace_period = 300
+   primary_parameter_stores             = {for a,b in var.manifest : a => try(flatten(compact([for index, entry in b : entry.products["!!PRODUCT!!"][terraform.workspace] > 0 ? entry.region_name : "" ]))[0], "")}
+   san_list                             = local.san_list
+   dns_prefix                           = lookup(var.products["!!PRODUCT!!"].parameters, "dns_prefix", "ldap")
+   region_list                          = {for x,y in var.manifest : x => compact([for a,b in y : b.products["!!PRODUCT!!"][terraform.workspace] > 0 ? b.region_name : ""])}
+   cloud_dns                            = local.cloud_dns
+   cloud_provider                       = "!!CLOUD!!"
+   cloud_providers                      = local.cloud_providers
+   subscription_id                      = var.account_owner["aws"][terraform.workspace]
+   az                                   = var.manifest["!!CLOUD!!"][!!REGION_NUMBER!!].azs
+   tenant_id                            = local.tenant_id
+   client_id                            = local.client_id
+   client_secret                        = local.client_secret
+   aws_storage_account                  = var.aws_storage_account
+   internet_control_access              = var.internet_control_access[terraform.workspace]
+
+   providers = {
+      aws.route53 = aws.route53
+      aws = aws.!!REGION_ALIAS!!
+   }
+}
+
+module "capsmp_!!REGION_ALIAS!!" {
+   source                               = "./modules_aws/capsmp"
+   module                               = "capsmp"
+   products                             = var.products
+   product_name                         = "!!PRODUCT!!"
+   instance_type                        = var.products["!!PRODUCT!!"].instance["!!CLOUD!!"][terraform.workspace]
+   account_owner                        = var.account_owner["!!CLOUD!!"][terraform.workspace]
+   ami_account_owner                    = var.ami_account_owner["!!CLOUD!!"][terraform.workspace]
+   ami_version                          = "${var.products["!!PRODUCT!!"].ami["!!CLOUD!!"][terraform.workspace]}-!!TAG_VERSION!!"
+   aws_key_pair_id                      = aws_key_pair.!!REGION_ALIAS!!_admin_access.id
+   module_version                       = "TBA"
+   products_installed                   = local.products_installed["!!CLOUD!!"]
+   vpc_id                               = local.vpcs["!!REGION_ALIAS!!"]
+   customer_name                        = var.customer_name
+   dns_suffix                           = var.dns_suffix
+   termination_protection               = var.termination_protection
+   cidr_blocks                          = local.subnet_cidr_blocks
+   security_group_ids                   = local.security_group_ids["!!REGION_ALIAS!!"]
+   first_region_running                 = compact([for index, entry in var.manifest["!!CLOUD!!"] : entry.products["!!PRODUCT!!"][terraform.workspace] > 0 ? index : ""] )[0]
+   number_of_regions                    = length(var.manifest["!!CLOUD!!"])
+   region_number                        = !!REGION_NUMBER!!
+   my_manifest                          = var.manifest["!!CLOUD!!"][!!REGION_NUMBER!!]
+   number_servers                       = var.manifest["!!CLOUD!!"][!!REGION_NUMBER!!].products["!!PRODUCT!!"][terraform.workspace]
+   subnet_ids                           = local.subnet_ids["!!REGION_ALIAS!!"][var.products["!!PRODUCT!!"].subnet]
+   health_check_grace_period = 300
+   primary_parameter_stores             = {for a,b in var.manifest : a => try(flatten(compact([for index, entry in b : entry.products["!!PRODUCT!!"][terraform.workspace] > 0 ? entry.region_name : "" ]))[0], "")}
+   san_list                             = local.san_list
+   dns_prefix                           = lookup(var.products["!!PRODUCT!!"].parameters, "dns_prefix", "ldap")
+   region_list                          = {for x,y in var.manifest : x => compact([for a,b in y : b.products["!!PRODUCT!!"][terraform.workspace] > 0 ? b.region_name : ""])}
+   cloud_dns                            = local.cloud_dns
+   cloud_provider                       = "!!CLOUD!!"
+   cloud_providers                      = local.cloud_providers
+   subscription_id                      = var.account_owner["aws"][terraform.workspace]
+   az                                   = var.manifest["!!CLOUD!!"][!!REGION_NUMBER!!].azs
+   tenant_id                            = local.tenant_id
+   client_id                            = local.client_id
+   client_secret                        = local.client_secret
+   aws_storage_account                  = var.aws_storage_account
+   internet_control_access              = var.internet_control_access[terraform.workspace]
+
+   providers = {
+      aws.route53 = aws.route53
+      aws = aws.!!REGION_ALIAS!!
+   }
+}
+module "cavault_!!REGION_ALIAS!!" {
+   source                               = "./modules_aws/cavault"
+   module                               = "cavault"
+   products                             = var.products
+   product_name                         = "!!PRODUCT!!"
+   instance_type                        = var.products["!!PRODUCT!!"].instance["!!CLOUD!!"][terraform.workspace]
+   account_owner                        = var.account_owner["!!CLOUD!!"][terraform.workspace]
+   ami_account_owner                    = var.ami_account_owner["!!CLOUD!!"][terraform.workspace]
+   ami_version                          = "${var.products["!!PRODUCT!!"].ami["!!CLOUD!!"][terraform.workspace]}-!!TAG_VERSION!!"
+   aws_key_pair_id                      = aws_key_pair.!!REGION_ALIAS!!_admin_access.id
+   module_version                       = "TBA"
+   products_installed                   = local.products_installed["!!CLOUD!!"]
+   vpc_id                               = local.vpcs["!!REGION_ALIAS!!"]
+   customer_name                        = var.customer_name
+   dns_suffix                           = var.dns_suffix
+   termination_protection               = var.termination_protection
+   cidr_blocks                          = local.subnet_cidr_blocks
+   security_group_ids                   = local.security_group_ids["!!REGION_ALIAS!!"]
+   first_region_running                 = compact([for index, entry in var.manifest["!!CLOUD!!"] : entry.products["!!PRODUCT!!"][terraform.workspace] > 0 ? index : ""] )[0]
+   number_of_regions                    = length(var.manifest["!!CLOUD!!"])
+   region_number                        = !!REGION_NUMBER!!
+   my_manifest                          = var.manifest["!!CLOUD!!"][!!REGION_NUMBER!!]
+   number_servers                       = var.manifest["!!CLOUD!!"][!!REGION_NUMBER!!].products["!!PRODUCT!!"][terraform.workspace]
+   subnet_ids                           = local.subnet_ids["!!REGION_ALIAS!!"][var.products["!!PRODUCT!!"].subnet]
+   health_check_grace_period = 300
+   primary_parameter_stores             = {for a,b in var.manifest : a => try(flatten(compact([for index, entry in b : entry.products["!!PRODUCT!!"][terraform.workspace] > 0 ? entry.region_name : "" ]))[0], "")}
+   san_list                             = local.san_list
+   dns_prefix                           = lookup(var.products["!!PRODUCT!!"].parameters, "dns_prefix", "ldap")
+   region_list                          = {for x,y in var.manifest : x => compact([for a,b in y : b.products["!!PRODUCT!!"][terraform.workspace] > 0 ? b.region_name : ""])}
+   cloud_dns                            = local.cloud_dns
+   cloud_provider                       = "!!CLOUD!!"
+   cloud_providers                      = local.cloud_providers
+   subscription_id                      = var.account_owner["aws"][terraform.workspace]
+   az                                   = var.manifest["!!CLOUD!!"][!!REGION_NUMBER!!].azs
+   tenant_id                            = local.tenant_id
+   client_id                            = local.client_id
+   client_secret                        = local.client_secret
+   aws_storage_account                  = var.aws_storage_account
+   internet_control_access              = var.internet_control_access[terraform.workspace]
+
+   providers = {
+      aws.route53 = aws.route53
+      aws = aws.!!REGION_ALIAS!!
+   }
+}

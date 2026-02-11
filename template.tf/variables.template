@@ -61,6 +61,10 @@ variable "dns_suffix" {
   type = map(string)
 }
 
+variable "dns_delegation" {
+  type = map(string)
+}
+
 variable "termination_protection" {
   type = bool
 }
