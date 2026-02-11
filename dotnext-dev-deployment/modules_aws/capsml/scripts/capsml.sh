@@ -28,9 +28,9 @@ export CLIENT_SECRET="${CLIENT_SECRET}"
    echo "                    Deployed at $(date)"
 ) >> /etc/motd
 
-bash /opt/AIL/install/ail_base.sh "${CUSTOMER}" "${ENVIRONMENT}" "${PRODUCT_NAME}"
+#bash /opt/AIL/install/ail_base.sh "${CUSTOMER}" "${ENVIRONMENT}" "${PRODUCT_NAME}"
 echo "Base OS Setup complete"
 
-bash /opt/AIL/install/control.sh
+#bash /opt/AIL/install/control.sh
 
-rm /opt/AIL/install/ail_base.sh
+#rm /opt/AIL/install/ail_base.sh

@@ -23,8 +23,20 @@ ls -lR /opt/AIL/install
 echo "========================================"
 echo "Updating"
 
-# Enable EPEL (Required for 'haveged' and 'figlet' on RHEL)
-sudo dnf install -y https://dl.fedoraproject.org
+cd /tmp
+sudo sed -i 's/enabled=1/enabled=0/g' /etc/dnf/plugins/subscription-manager.conf
+sudo curl -sSLo /tmp/epel-release-9.rpm https://dl.fedoraproject.org/pub/epel/epel-release-latest-9.noarch.rpm
+
+if [ $(stat -c%s "/tmp/epel-release-9.rpm") -gt 5000 ]; then
+    sudo dnf install -y /tmp/epel-release-9.rpm
+else
+    echo "Download failed or file is too small. Check connectivity to mirrors."
+    exit 1
+fi
+
+sudo chmod 644 /tmp/epel-release-9.rpm
+sudo dnf install -y -q /tmp/epel-release-9.rpm
+rm -f /tmp/epel-release-9.rpm
 
 retVal=1
 while [ ${retVal} -ne 0 ]
@@ -58,9 +70,19 @@ done
 # Remove nano and postfix (RHEL equivalent of exim4)
 sudo dnf remove -y nano postfix
 
+
 echo "Installing Azure CLI"
+# 1. Import the specific GPG key for Microsoft packages
 sudo rpm --import https://packages.microsoft.com
-echo -e "[azure-cli]\nname=Azure CLI\nbaseurl=https://packages.microsoft.com\nenabled=1\ngpgcheck=1\ngpgkey=https://packages.microsoft.com" | sudo tee /etc/yum.repos.d/azure-cli.repo
+
+echo -e "[azure-cli]
+name=Azure CLI
+baseurl=https://packages.microsoft.com
+enabled=1
+gpgcheck=1
+gpgkey=https://packages.microsoft.com" | sudo tee /etc/yum.repos.d/azure-cli.repo
+
+# 3. Install it
 sudo dnf install -y azure-cli
 
 echo "Setting up AWS Credentials"
@@ -111,13 +133,15 @@ echo "Installing AWS CLI"
 sudo dnf install -y awscli
 
 echo "Installing SSM Agent"
-# RHEL 9 uses the same RPM for x86_64 or aarch64 (handled by AWS URL)
-sudo dnf install -y https://s3.amazonaws.com(if [ "$ARCH" == "aarch64" ]; then echo "arm64"; else echo "amd64"; fi)/amazon-ssm-agent.rpm
-systemctl enable --now amazon-ssm-agent
+# Corrected URL construction
+if [ "$ARCH" == "aarch64" ]; then 
+    SSM_URL_ARCH="arm64"
+else 
+    SSM_URL_ARCH="amd64"
+fi
 
-# VIM mouse disable (RHEL path)
-echo "set mouse-=a" >> /etc/vimrc
+sudo dnf install -y "https://s3.amazonaws.com{SSM_URL_ARCH}/amazon-ssm-agent.rpm"
+sudo systemctl enable --now amazon-ssm-agent
 
 echo "Installed & Configured"
 echo "========================================"
-

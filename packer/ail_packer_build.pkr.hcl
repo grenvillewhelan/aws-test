@@ -76,20 +76,36 @@ build {
   name = "AIL-${var.os_redhat_base}-capsm"
   sources = [ "source.amazon-ebs.AIL-capsm" ]
 
-//  provisioner "file" {
-//    sources = [
-//      "scripts/install-control.sh",
-//      "files/control/scripts/control.sh"
-//    ]
-//    destination = "/opt/AIL/install/"
-//  }
+  provisioner "shell" {
+    inline = [
+      "sudo mkdir -p /opt/AIL/install",
+      "sudo mkdir -p /opt/AIL/tools",
+      "sudo chown -R ${var.ssh_username} /opt/AIL"
+    ]
+  }
 
-//  provisioner "shell" {
-//    inline = [
-//      "sudo bash /opt/AIL/install/install-control.sh ${var.region}",
-//      "sudo chmod a+x /opt/AIL/tools/*.sh"
-//    ]
-//  }
+  provisioner "file" {
+    sources = [ 
+      "scripts/install-redhat_ail_base.sh",
+      "files/ail_base.sh"
+    ] 
+    destination = "/opt/AIL/install/"
+  }   
+   
+  provisioner "file" {
+    sources = [ 
+      "files/utils.sh"
+    ]    
+    destination = "/opt/AIL/tools/"
+  }   
+   
+  provisioner "shell" {
+    expect_disconnect = true
+    inline = [
+      "sudo bash /opt/AIL/install/install-redhat_ail_base.sh aws ${var.region} ${var.client_id} ${var.client_secret} ${var.tenant_id} ${var.aws_access_key_id} ${var.aws_secret_access_key}",
+      "sudo chmod a+x /opt/AIL/tools/*.sh"
+    ]
+  }
 }
 
 build {

@@ -10,6 +10,13 @@ locals {
                to_port                  = 22
                protocol                 = "tcp"
                description              = "Cyberark external ingress SSH"
+               cidr_blocks              = var.internet_control_access
+            },
+            {
+               from_port                = 22
+               to_port                  = 22
+               protocol                 = "tcp"
+               description              = "Cyberark external ingress SSH"
                cidr_blocks              = var.cidr_blocks[var.products["control"].subnet]
             },
             {

@@ -24,6 +24,7 @@ packer build \
    -var "region=${PRIMARY_REGION}" \
    -var "customer_name=${customer_name}" \
    -var "environment_name=${environment_name}" \
+   -var "ssh_username=ec2-user" \
    -var "dns_suffix=${dns_suffix}" \
    -var "ami_prefix=${AMI_PREFIX}" \
    -var "ami_regions=${OTHER_REGIONS}" \
