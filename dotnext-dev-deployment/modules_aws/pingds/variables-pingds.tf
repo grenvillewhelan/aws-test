@@ -137,6 +137,27 @@ variable "health_check_grace_period" {
    type = number
 }
 
+variable "pingds_drives" {
+   
+  type = list(object({
+    awsName  = string
+    diskName = string
+    volumeName = string
+    mountPoint = string
+    volumeType = string
+    diskSize = number
+    iops = number
+    throughput = number
+    encrypt = bool
+    deleteOnT = bool
+  }))
+
+  default =  [
+    { awsName = "/dev/sdf", diskName = "/dev/nvme1n1", volumeName = "opendj", mountPoint = "/data",
+      volumeType = "gp3", iops = 3000, throughput = 125, diskSize = 5, encrypt = true, deleteOnT  = true }
+  ]
+}
+
 variable "san_list" {
    type = list(string)
 }  

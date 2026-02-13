@@ -32,7 +32,9 @@ resource "aws_route_table" "vpc_route_table" {
 
    route {
      cidr_block = "0.0.0.0/0"
-     gateway_id = var.subnets[count.index % length(var.subnets)].subnet_name == var.products["network"].subnet || var.subnets[count.index % length(var.subnets)].subnet_name == var.products["control"].subnet ? aws_internet_gateway.internet_gateway.id : aws_nat_gateway.customer_nat_gw[count.index % length(var.manifest[var.cloud_provider][var.region_number].azs)].id
+//     gateway_id = var.subnets[count.index % length(var.subnets)].subnet_name == var.products["network"].subnet || var.subnets[count.index % length(var.subnets)].subnet_name == var.products["control"].subnet ? aws_internet_gateway.internet_gateway.id : aws_nat_gateway.customer_nat_gw[count.index % length(var.manifest[var.cloud_provider][var.region_number].azs)].id
+
+     gateway_id = var.subnets[count.index % length(var.subnets)].nat_gw ? aws_nat_gateway.customer_nat_gw[count.index % length(var.manifest[var.cloud_provider][var.region_number].azs)].id : aws_internet_gateway.internet_gateway.id
    }
 
    dynamic "route" {

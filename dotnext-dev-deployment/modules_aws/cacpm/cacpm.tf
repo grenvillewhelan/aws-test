@@ -25,7 +25,9 @@ EOF
 
 
   tags = {
-    Name = "${var.product_name}-${count.index}"
+    Name        = join ("",["${var.product_name}-",count.index])
+    ServerType  = "CyberarmCPM"
+    Environment = terraform.workspace
   }
 }
 

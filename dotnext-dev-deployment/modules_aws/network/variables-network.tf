@@ -96,6 +96,7 @@ variable "subnets" {
       subnet_name = string
       newbits     = number
       netnum      = number
+      nat_gw      = bool
    }))
 }
 

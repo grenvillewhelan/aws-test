@@ -23,9 +23,10 @@ EOF
 
   vpc_security_group_ids = concat([var.security_group_ids["${var.product_name}"]], aws_security_group.cavault[*].id)
 
-
   tags = {
-    Name = "${var.product_name}-${count.index}"
+    Name        = join ("",["${var.product_name}-",count.index])
+    ServerType  = "CyberarkVault"
+    Environment = terraform.workspace
   }
 }
 

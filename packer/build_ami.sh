@@ -1,5 +1,5 @@
   AWS_PROFILE=packer
-  AMI_ACCOUNT_OWNER=762233743855
+  AMI_ACCOUNT_OWNER=815931740430
   AMI_PREFIX="AIL"
   customer_name="bt"
   environment_name="dev"
@@ -18,13 +18,13 @@
   TAG_VERSION="v1.0.0e"
 
 packer build \
-   -only "*.amazon-ebs.${AMI_PREFIX}-capsm" \
+   -only "*.amazon-ebs.${AMI_PREFIX}-pingds" \
    -var "profile=${AWS_PROFILE}" \
    -var "aws_account=${AMI_ACCOUNT_OWNER}" \
    -var "region=${PRIMARY_REGION}" \
    -var "customer_name=${customer_name}" \
    -var "environment_name=${environment_name}" \
-   -var "ssh_username=ec2-user" \
+   -var "ssh_username=ubuntu" \
    -var "dns_suffix=${dns_suffix}" \
    -var "ami_prefix=${AMI_PREFIX}" \
    -var "ami_regions=${OTHER_REGIONS}" \
@@ -32,7 +32,6 @@ packer build \
    -var "aws_secret_access_key=${aws_secret_access_key}" \
    -var "aws_access_key_id=${aws_access_key_id}" \
    -var "os_base=${OS_BASE_AWS}" \
-   -var "os_redhat_base=${OS_BASE_AWS_REDHAT}" \
    -var "os_base_win=${OS_BASE_AWS_WINDOWS}" \
    -var "subscription_id=${ARM_SUBSCRIPTION_ID}" \
    -var "tenant_id=${ARM_TENANT_ID}" \
@@ -41,3 +40,5 @@ packer build \
    .
 
 
+#   -var "os_redhat_base=${OS_BASE_AWS_REDHAT}" \
+#   -var "ssh_username=ec2-user" \

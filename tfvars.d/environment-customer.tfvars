@@ -41,13 +41,13 @@ manifest = {
                         "web_ingress"       = { dev = 0, prod = 0}
                         "control"           = { dev = 1, prod = 1}
                         "cavault"           = { dev = 1, prod = 1}
-                        "capvwa"            = { dev = 1, prod = 1}
-                        "cacpm"             = { dev = 1, prod = 1}
-                        "capsm"             = { dev = 1, prod = 1}
-                        "capsml"            = { dev = 1, prod = 1}
-                        "capsmp"            = { dev = 1, prod = 1}
-                        "pingds"            = { dev = 1, prod = 1}
-                        "pingam"            = { dev = 1, prod = 1}
+                        "capvwa"            = { dev = 2, prod = 1}
+                        "cacpm"             = { dev = 2, prod = 1}
+                        "capsm"             = { dev = 2, prod = 1}
+                        "capsml"            = { dev = 2, prod = 1}
+                        "capsmp"            = { dev = 2, prod = 1}
+                        "pingds"            = { dev = 2, prod = 1}
+                        "pingam"            = { dev = 2, prod = 1}
                         "pingidm"           = { dev = 1, prod = 1}
                      }
    
@@ -143,7 +143,7 @@ products = {
      "capvwa" = {
         module          = "capvwa"
         cluster         = ""
-        subnet          = "internet"
+        subnet          = "data"
         ami             = {
                              "aws" = { 
                                 "dev"  = "AIL-Windows_Server-2022-English-Core-Base-cyberark"
@@ -157,13 +157,15 @@ products = {
                              }
                           }
         requires        = "network"
-        parameters      = {}
+        parameters      = {
+                             "dns_prefix"               = "pam"
+                          }
      }
 
      "cacpm" = {
         module          = "cacpm"
         cluster         = ""
-        subnet          = "internet"
+        subnet          = "data"
         ami             = {
                              "aws" = { 
                                 "dev"  = "AIL-Windows_Server-2022-English-Core-Base-cyberark"
@@ -177,13 +179,14 @@ products = {
                              }
                           }
         requires        = "network"
-        parameters      = {}
+        parameters      = {
+                          }
      }
 
      "capsm" = {
         module          = "capsm"
         cluster         = ""
-        subnet          = "internet"
+        subnet          = "data"
         ami             = {
                              "aws" = { 
                                 "dev"  = "AIL-Windows_Server-2022-English-Core-Base-cyberark"
@@ -197,13 +200,15 @@ products = {
                              }
                           }
         requires        = "network"
-        parameters      = {}
+        parameters      = {
+                             "dns_prefix"               = "psm-windows-farm"
+                          }
      }
 
      "capsml" = {
         module          = "capsml"
         cluster         = ""
-        subnet          = "internet"
+        subnet          = "data"
         ami             = {
                              "aws" = { 
                                 "dev"  = "AIL-RHEL-9.3.0_HVM-20240229-arm64-arm-capsm"
@@ -217,13 +222,15 @@ products = {
                              }
                           }
         requires        = "network"
-        parameters      = {}
+        parameters      = {
+                             "dns_prefix"               = "psm-linux-farm"
+                          }
      }
 
      "capsmp" = {
         module          = "capsmp"
         cluster         = ""
-        subnet          = "internet"
+        subnet          = "data"
         ami             = {
                              "aws" = { 
                                 "dev"  = "AIL-Windows_Server-2022-English-Core-Base-cyberark"
@@ -258,7 +265,7 @@ products = {
                           }
         requires        = "network"
         parameters      = {  "backup_prefix"            = "pingds"
-                             "dns_prefix"               = "ldap",
+                             "dns_prefix"               = "ldaps",
                              "web_ingress"              = false
                              "pingfed_cluster"          = ""
                              "pingds_log_retention"    = 7
@@ -291,20 +298,7 @@ products = {
                              }
                           }
         requires        = "network"
-        parameters      = {  "backup_prefix"            = "pingam"
-                             "dns_prefix"               = "ldap",
-                             "web_ingress"              = false
-                             "pingfed_cluster"          = ""
-                             "pingds_log_retention"    = 7
-                             "pingds_ldif_backup_time" = "03:00"
-                             "pingds_backup_time"      = "02:00"
-                             "host_name"                = "ldap",
-                             "frontend_port"            = 8443,
-                             "backend_port"             = 8443,
-                             "healthcheck_path"         = "/available-state",
-                             "healthcheck_interval"     = 10,
-                             "healthcheck_timeout"      = 10,
-                             "unhealthy_threshold"      = 3
+                             "dns_prefix"               = "am"
                           }
      }
 
@@ -346,7 +340,7 @@ products = {
 
 test_mode                               = true
 https_customer_certificate              = false
-route53_provider                        = "gwhelan_dev"
+route53_provider                        = "dotnext_dev"
 build_version                           = "TBA"
 termination_protection                  = true
 

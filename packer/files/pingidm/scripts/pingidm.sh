@@ -26,6 +26,6 @@ echo "Running PingIDM setup"
 echo
 
 echo "${VERSION}" > /opt/openidm/.version
-update_name_tag "${SERVER_TYPE}-running"
+update_name_tag "${SERVER_NAME}-running"
 
 echo "$0: Completed at $(date)"

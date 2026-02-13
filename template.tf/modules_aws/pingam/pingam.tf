@@ -1,75 +1,96 @@
-resource "aws_instance" "pingam_server" {
-   count         = var.number_servers
-   subnet_id     = element(var.subnet_ids, count.index%length(var.subnet_ids))
+resource "aws_launch_template" "pingam" {
+   name          = "pingam"
+   image_id      = data.aws_ami.pingam_ami.id
    instance_type = var.instance_type
-   key_name      = var.aws_key_pair_id
-   availability_zone = join("", [var.my_manifest.region_name, var.az[count.index % length(var.az)]])
+   update_default_version = true
 
-  iam_instance_profile =   "${local.hyphenated_name}-server"
+   iam_instance_profile {
+      name = "${local.hyphenated_name}-server"
+   }
 
-  ami = data.aws_ami.pingam_ami.id
+   user_data = base64encode(templatefile("${path.module}/scripts/pingam.sh", {
+      CUSTOMER                       = var.customer_name
+      ENVIRONMENT                    = terraform.workspace
+      PRODUCT                        = "pingam"
+      BUILD_VERSION                  = data.aws_ami.pingam_ami.name
+      MODULE_VERSION                 = var.module_version
+      REGION                         = var.my_manifest.region_name
+      REGION_ALIAS                   = var.my_manifest.region_alias
+      DNS_PREFIX                     = var.dns_prefix
+      NUMBER_OF_SERVERS              = var.number_servers
+      HEALTH_CHECK_GRACE_PERIOD      = var.health_check_grace_period
+      CLOUD_DNS                      = replace(jsonencode(var.cloud_dns), "\"", "\\\"")
+      DNS_SUFFIX                     = var.dns_suffix["aws"]
+      CLUSTER                        = var.products[var.product_name].cluster
+      PRODUCT_NAME                   = var.product_name
+      CLOUD_PROVIDER                 = var.cloud_provider
+      CLOUD_PROVIDERS                = replace(jsonencode(var.cloud_providers), "\"", "\\\"")
+      HOSTED_ZONE_ID                 = var.cloud_dns["aws"]["internal"].dns_zone_id 
+   }))
 
-  user_data = templatefile("${path.module}/scripts/pingam.sh", {
-        BUILD_VERSION                          = data.aws_ami.pingam_ami.name
-        MODULE_VERSION                         = var.module_version
-        REGION                                 = var.my_manifest.region_name
-        REGION_ALIAS                           = var.my_manifest.region_alias
-        PRODUCT                                = "pingam"
-        PRIMARY_PARAMETER_STORES               = replace(jsonencode(var.primary_parameter_stores), "\"", "\\\"")
-        SERVER_INSTANCE                        = count.index + 1
-        LOG_RETENTION                          = try(var.products[var.product_name].parameters["pingam_log_retention"], "7")
-        CUSTOMER                               = var.customer_name
-        ENVIRONMENT                            = terraform.workspace
-        PINGDIRECTORY_BASE_DN                  = replace("dc=${terraform.workspace},dc=${var.customer_name},dc=${var.dns_suffix["aws"]}", ".", ",dc=")
-        PINGDIRECTORY_UNDERSCORE_BASE_DN       = replace("dc_${terraform.workspace}_dc_${var.customer_name}_dc_${var.dns_suffix["aws"]}", ".", "_dc_")
+   key_name = var.aws_key_pair_id
 
-        DNS_SUFFIX                             = var.dns_suffix["aws"]
-        PD_BACKUP_TIME                         = try(var.products[var.product_name].parameters["pingam_backup_time"], "02:00")
-        LDIF_BACKUP_TIME                       = try(var.products[var.product_name].parameters["pingam_ldif_backup_time"], "03:00")
-        PD_BACKUP_STAGGER_MINS                 = local.backup_stagger_time
-        REGION_BACKUP_START_DELAY              = var.region_number * var.number_servers
-        CLUSTER                                = var.products[var.product_name].cluster
-        PRODUCT_NAME                           = var.product_name
-        BACKUP_PREFIX                          = lookup(var.products[var.product_name].parameters, "backup_prefix", "pd")
-        PF_CLUSTER                             = lookup(var.products[var.product_name].parameters, "pingfed_cluster", "none")
-        REGION_LIST                            = replace(jsonencode(var.region_list), "\"", "\\\"")
-        TENANT_ID                              = var.tenant_id
-        CLIENT_ID                              = var.client_id
-        CLIENT_SECRET                          = var.client_secret
-        CLOUD_PROVIDER                         = var.cloud_provider
-        CLOUD_PROVIDERS                        = replace(jsonencode(var.cloud_providers), "\"", "\\\"")
-        CLOUD_DNS                              = replace(jsonencode(var.cloud_dns), "\"", "\\\"")
-        SUBSCRIPTION_ID                        = var.subscription_id
-      })
+   network_interfaces {
+      security_groups = concat([var.security_group_ids[var.product_name]], aws_security_group.pingam[*].id)
 
-  disable_api_termination = var.termination_protection
+      delete_on_termination       = true 
+   }
 
-  ebs_optimized = true
-
-  vpc_security_group_ids = concat([var.security_group_ids["${var.product_name}"]], aws_security_group.pingam[*].id)
-
-  tags = {
-    Name       = join ("",["${var.product_name}-",count.index])
-    ServerType = var.product_name
-    Status     = "unreplicated"
-    RegionAlias  = "${var.my_manifest.region_alias}"
-  }
-
-  depends_on = [
-                  aws_iam_policy_attachment.pingam_server
-  ]
-
-  lifecycle {
-    ignore_changes = [ tags, tags_all, ami, user_data ]
-  }
+  depends_on = [aws_iam_instance_profile.pingam_server ]
 }
 
-# DNS
+resource "aws_autoscaling_group" "pingam" {
+   name                      = var.product_name
+   max_size                  = var.number_servers
+   min_size                  = var.number_servers
+   desired_capacity          = var.number_servers
 
-locals {
-  pd_dns_prefix = "ldap"
-  dir_prefix    = "dir"
-  backup_stagger_time = "30"
+   health_check_type         = "ELB"
+   health_check_grace_period = var.health_check_grace_period
+   force_delete              = true
 
-//  region_backup_mins = try(var.products[var.product_name].parameters["pingam_ldif_backup_time"], "03:00")
+   target_group_arns = [aws_lb_target_group.pingam_https.arn ]
+
+
+   launch_template {
+      id = aws_launch_template.pingam.id
+   }
+
+   termination_policies = [
+      "AllocationStrategy",
+      "OldestInstance",
+      "OldestLaunchConfiguration",
+      "ClosestToNextInstanceHour"
+   ]
+
+   metrics_granularity = "1Minute"
+
+   vpc_zone_identifier = var.subnet_ids
+
+   instance_refresh {
+      strategy = "Rolling"
+   }
+
+   tag {
+      key                 = "ServerType"
+      value               = "PingAM"
+      propagate_at_launch = true
+   }
+
+   tag {
+      key                 = "Name"
+      value               = "pingam"
+      propagate_at_launch = true
+   }
+
+   tag {
+      key                 = "Environment"
+      value               = terraform.workspace
+      propagate_at_launch = true
+   }
+
+  depends_on = [ aws_iam_policy_attachment.pingam_server,
+                 aws_lb_target_group.pingam_https
+               ]
+
 }

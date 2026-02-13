@@ -46,6 +46,11 @@ resource "aws_iam_policy" "pingam_server_policy" {
         Resource = "*"
       },
       {
+        Action   = "route53:ChangeResourceRecordSets"
+        Effect   = "Allow"
+        Resource = "arn:aws:route53:::hostedzone/${var.cloud_dns["aws"]["internal"].dns_zone_id}"
+      },
+      {
         Action = [
           "ec2:CreateTags" # TODO limit scope
         ]
@@ -74,12 +79,7 @@ resource "aws_iam_policy" "pingam_server_policy" {
         ]
         Effect = "Allow"
         Resource = [
-
-          "arn:aws:ssm:*:${var.account_owner}:parameter/${var.customer_name}/${terraform.workspace}/pingam/*/replication_leader",
-          "arn:aws:ssm:*:${var.account_owner}:parameter/${var.customer_name}/${terraform.workspace}/pingam/*/pingam_replication_admin_password",
-          "arn:aws:ssm:*:${var.account_owner}:parameter/${var.customer_name}/${terraform.workspace}/pingam/*/pingam_pingfed_oauth_client_username",
-          "arn:aws:ssm:*:${var.account_owner}:parameter/${var.customer_name}/${terraform.workspace}/pingam/*/pingam_pingfed_oauth_client_password",
-          "arn:aws:ssm:*:${var.account_owner}:parameter/${var.customer_name}/${terraform.workspace}/pingam/*/binary_backup_time"
+          "arn:aws:ssm:*:${var.account_owner}:parameter/${var.customer_name}/${terraform.workspace}/pingam/*/replication_leader"
         ]
       },
       # Kinesis / Elastic Search
@@ -91,19 +91,6 @@ resource "aws_iam_policy" "pingam_server_policy" {
               "firehose:ListDeliveryStreams"
           ],
           "Resource": "*"
-      },
-      {
-          "Sid": "VisualEditor0",
-          "Effect": "Allow",
-          "Action": [
-              "firehose:PutRecord",
-              "firehose:PutRecordBatch"
-          ],
-          "Resource": [
-              "arn:aws:firehose:*:${var.account_owner}:deliverystream/pingam-access",
-              "arn:aws:firehose:*:${var.account_owner}:deliverystream/pingam-errors",
-              "arn:aws:firehose:*:${var.account_owner}:deliverystream/pingam-failedops"
-          ]
       },
       {
         "Effect": "Allow",

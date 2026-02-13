@@ -10,7 +10,7 @@ locals {
                to_port                  = 22
                protocol                 = "tcp"
                description              = "Cyberark external ingress SSH"
-               cidr_blocks              = var.cidr_blocks[var.products["control"].subnet]
+               cidr_blocks              = var.internet_control_access
             },
             {
                from_port                = 3389
@@ -24,7 +24,7 @@ locals {
                to_port                  = 443
                protocol                 = "tcp"
                description              = "Cyberark ingress 443"
-               cidr_blocks              = var.internet_control_access
+               cidr_blocks              = var.cidr_blocks["all"]
             }
          ]
       }

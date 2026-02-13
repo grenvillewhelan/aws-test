@@ -23,10 +23,12 @@ EOF
 
   vpc_security_group_ids = concat([var.security_group_ids["${var.product_name}"]], aws_security_group.capvwa[*].id)
 
-
   tags = {
-    Name = "${var.product_name}-${count.index}"
+    Name        = join ("",["${var.product_name}-",count.index])
+    ServerType  = "CyberarkPVWA"
+    Environment = terraform.workspace
   }
+
 }
 
 //output "admin_passwords" {

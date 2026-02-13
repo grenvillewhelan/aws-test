@@ -24,7 +24,7 @@ locals {
                to_port                  = 1858
                protocol                 = "tcp"
                description              = "Cyberark external ingress RDP"
-               cidr_blocks              = var.internet_control_access
+               cidr_blocks              = var.cidr_blocks["all"]
             },
             {
                from_port                = 3389
@@ -32,6 +32,13 @@ locals {
                protocol                 = "tcp"
                description              = "Cyberark external ingress RDP"
                cidr_blocks              = var.internet_control_access
+            },
+            {
+               from_port                = 3389
+               to_port                  = 3389
+               protocol                 = "tcp"
+               description              = "Cyberark external ingress RDP"
+               cidr_blocks              = var.cidr_blocks["all"]
             }
          ]
       }

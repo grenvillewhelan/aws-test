@@ -37,7 +37,11 @@ provider "aws" {
 provider "aws" {
   alias   = "route53"
   region  = "eu-west-1"
-  profile = "gwhelan_dev"
+  profile = "dotnext_dev"
+
+//  assume_role {
+//    role_arn = "arn:aws:iam::762233743855:role/DNSManagerRole"
+//  }
 }
 
 provider "aws" {

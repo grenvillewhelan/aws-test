@@ -37,7 +37,7 @@ resource "aws_instance" "control_server" {
   }
 
   tags = {
-    Name = "${var.product_name}-0"
+    Name = var.product_name
   }
  
   lifecycle {

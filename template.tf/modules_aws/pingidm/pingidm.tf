@@ -49,10 +49,9 @@ resource "aws_instance" "pingidm_server" {
   vpc_security_group_ids = concat([var.security_group_ids["${var.product_name}"]], aws_security_group.pingidm[*].id)
 
   tags = {
-    Name       = join ("",["${var.product_name}-",count.index])
-    ServerType = var.product_name
-    Status     = "unreplicated"
-    RegionAlias  = "${var.my_manifest.region_alias}"
+    Name        = join ("",["${var.product_name}-",count.index])
+    ServerType  = "PingIDM"
+    Environment = terraform.workspace
   }
 
   depends_on = [

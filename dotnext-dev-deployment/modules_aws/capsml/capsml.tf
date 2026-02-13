@@ -38,7 +38,9 @@ resource "aws_instance" "capsml_server" {
   }
 
   tags = {
-    Name = "${var.product_name}-${count.index}"
+    Name        = join ("",["${var.product_name}-",count.index])
+    ServerType  = "CyberarkPSML"
+    Environment = terraform.workspace
   }
  
   lifecycle {

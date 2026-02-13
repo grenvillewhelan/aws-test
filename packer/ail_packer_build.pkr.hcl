@@ -115,17 +115,11 @@ build {
    provisioner "file" {
       sources = [
          "scripts/install-pingds.sh",
+         "scripts/create-volumes.sh",
          "files/pingds/scripts/pingds.sh"
       ]
 
       destination = "/opt/AIL/install/"
-   }
-
-   provisioner "file" {
-      sources = [
-         "files/pingds/scripts/pingds-tools.sh"
-      ]
-      destination = "/opt/AIL/tools/"
    }
 
    provisioner "shell" {

@@ -4,7 +4,7 @@
 
 CUSTOMER=$1
 ENVIRONMENT=$2
-SERVER_TYPE=$3
+SERVER_NAME=$3
 
 function nrblue_echo() {
    echo -en "\033[0m\033[34m\033[1m$* \033[0m"
@@ -89,7 +89,7 @@ function apply_local_hardening() {
 
 # Following line commented out due to issues with Debian update on Oct-7-2023
 #   echo "AllowUsers admin" >> /etc/ssh/sshd_config
-   echo "AllowGroups admin ${CUSTOMER}-${ENVIRONMENT}-ssh-${SERVER_TYPE}" >> /etc/ssh/sshd_config
+   echo "AllowGroups admin ${CUSTOMER}-${ENVIRONMENT}-ssh-${SERVER_NAME}" >> /etc/ssh/sshd_config
    echo "DenyUsers root" >> /etc/ssh/sshd_config
    echo "DenyGroups root" >> /etc/ssh/sshd_config
 
@@ -146,11 +146,11 @@ if [ "${CLOUD_PLATFORM}" == "azure" ]; then
    bash /opt/AIL/tools/azlogin.sh
 fi
 
-update_name_tag "${SERVER_TYPE}-waiting"
+update_name_tag "${SERVER_NAME}-waiting"
 
-echo "Updating sudoers for server type ${SERVER_TYPE} at $(date)"
+echo "Updating sudoers for server type ${SERVER_NAME} at $(date)"
 
-echo "%${CUSTOMER}-${ENVIRONMENT}-ssh-${SERVER_TYPE}-sudo	ALL=(ALL:ALL) ALL" > /etc/sudoers.d/90-AID
+echo "%${CUSTOMER}-${ENVIRONMENT}-ssh-${SERVER_NAME}-sudo	ALL=(ALL:ALL) ALL" > /etc/sudoers.d/90-AID
 
 echo
 echo "Applying harbian local hardening at $(date)"
@@ -159,7 +159,7 @@ echo "Applying harbian local hardening at $(date)"
 #   apply_local_hardening
 #fi
 
-wait_for_deployment_go ${SERVER_TYPE}
+wait_for_deployment_go ${SERVER_NAME}
 
-update_name_tag "${SERVER_TYPE}-deploying"
+update_name_tag "${SERVER_NAME}-deploying"
 echo "$0: Script completed at $(date)"

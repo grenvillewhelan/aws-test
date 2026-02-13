@@ -77,7 +77,7 @@ sudo systemctl enable tomcat
 sudo systemctl start tomcat
 
 echo "${VERSION}" > ${LOC_DIR}/.version
-update_name_tag "${SERVER_TYPE}-running"
+update_name_tag "${SERVER_NAME}-running"
 
 
 echo "$0: Completed at $(date)"
